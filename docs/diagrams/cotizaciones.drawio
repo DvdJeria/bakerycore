@@ -1,0 +1,79 @@
+<mxfile host="app.diagrams.net">
+  <diagram name="Flujo Cotizaciones Avanzado" id="quote-pro">
+    <mxGraphModel dx="1200" dy="800" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1100" pageHeight="850" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        
+        <mxCell id="start" value="Inicio: Nueva Cotización" style="ellipse;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;fontStyle=1;shadow=1;" vertex="1" parent="1">
+          <mxGeometry x="60" y="160" width="120" height="60" as="geometry" />
+        </mxCell>
+        
+        <mxCell id="step1" value="Seleccionar Materias Primas&#xa;desde el Catálogo Activo" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;shadow=1;" vertex="1" parent="1">
+          <mxGeometry x="220" y="150" width="160" height="80" as="geometry" />
+        </mxCell>
+        
+        <mxCell id="step2" value="Ingresar Cantidades Requeridas&#xa;por Insumo" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;shadow=1;" vertex="1" parent="1">
+          <mxGeometry x="420" y="150" width="160" height="80" as="geometry" />
+        </mxCell>
+        
+        <mxCell id="step3" value="Calcular Costo Base&#xa;(&amp;#8721; [Cant. x Costo Insumo])" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fff2cc;strokeColor=#d6b656;fontStyle=1;shadow=1;" vertex="1" parent="1">
+          <mxGeometry x="620" y="150" width="160" height="80" as="geometry" />
+        </mxCell>
+        
+        <mxCell id="step4" value="Aplicar Regla Comercial&#xa;(Regla de Tres / Factor Base)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffe6cc;strokeColor=#d79b00;shadow=1;" vertex="1" parent="1">
+          <mxGeometry x="620" y="280" width="160" height="80" as="geometry" />
+        </mxCell>
+        
+        <mxCell id="decision" value="¿Incluir Costos&#xa;Fijos (Gas/Luz)?" style="rhombus;whiteSpace=wrap;html=1;fillColor=#e1d5e7;strokeColor=#9673a6;fontStyle=1;shadow=1;" vertex="1" parent="1">
+          <mxGeometry x="415" y="270" width="170" height="100" as="geometry" />
+        </mxCell>
+        
+        <mxCell id="step5" value="Sumar Constantes&#xa;de Costos Fijos" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#e1d5e7;strokeColor=#9673a6;shadow=1;" vertex="1" parent="1">
+          <mxGeometry x="220" y="280" width="160" height="80" as="geometry" />
+        </mxCell>
+        
+        <mxCell id="step6" value="Guardar Cotización&#xa;con Nombre Identificatorio" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;fontStyle=1;shadow=1;" vertex="1" parent="1">
+          <mxGeometry x="220" y="410" width="160" height="80" as="geometry" />
+        </mxCell>
+
+        <mxCell id="end" value="Fin del Proceso" style="ellipse;whiteSpace=wrap;html=1;fillColor=#f8cecc;strokeColor=#b85450;fontStyle=1;shadow=1;" vertex="1" parent="1">
+          <mxGeometry x="440" y="420" width="120" height="60" as="geometry" />
+        </mxCell>
+
+        <!-- Enlaces -->
+        <mxCell id="e1" style="endArrow=classic;html=1;rounded=1;strokeWidth=2;" edge="1" parent="1" source="start" target="step1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e2" style="endArrow=classic;html=1;rounded=1;strokeWidth=2;" edge="1" parent="1" source="step1" target="step2">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e3" style="endArrow=classic;html=1;rounded=1;strokeWidth=2;" edge="1" parent="1" source="step2" target="step3">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e4" style="endArrow=classic;html=1;rounded=1;strokeWidth=2;" edge="1" parent="1" source="step3" target="step4">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e5" style="endArrow=classic;html=1;rounded=1;strokeWidth=2;" edge="1" parent="1" source="step4" target="decision">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e6" value="Sí" style="endArrow=classic;html=1;rounded=1;strokeWidth=2;" edge="1" parent="1" source="decision" target="step5">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e7" value="No" style="endArrow=classic;html=1;rounded=1;strokeWidth=2;" edge="1" parent="1" source="decision" target="step6">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="300" y="320" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="e8" style="endArrow=classic;html=1;rounded=1;strokeWidth=2;" edge="1" parent="1" source="step5" target="step6">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e9" style="endArrow=classic;html=1;rounded=1;strokeWidth=2;" edge="1" parent="1" source="step6" target="end">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>

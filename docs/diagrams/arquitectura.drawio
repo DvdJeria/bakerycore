@@ -1,0 +1,67 @@
+<mxfile host="app.diagrams.net">
+  <diagram name="Arquitectura Avanzada" id="arch-pro">
+    <mxGraphModel dx="1200" dy="800" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1100" pageHeight="850" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        
+        <!-- Contenedor Capa Cliente -->
+        <mxCell id="group_client" value="Capa de Cliente (Frontend Multiplataforma)" style="swimlane;whiteSpace=wrap;html=1;fillColor=#f5f5f5;strokeColor=#666666;fontStyle=1;fontSize=14;" vertex="1" parent="1">
+          <mxGeometry x="40" y="80" width="240" height="400" as="geometry" />
+        </mxCell>
+        <mxCell id="ui_ionic" value="&lt;b&gt;Ionic / Angular App&lt;/b&gt;&lt;br&gt;Interfaz Táctil Mobile&lt;br&gt;(Android / iOS)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;shadow=1;" vertex="1" parent="group_client">
+          <mxGeometry x="30" y="50" width="180" height="90" as="geometry" />
+        </mxCell>
+        <mxCell id="ui_cap" value="&lt;b&gt;Capacitor Plugins&lt;/b&gt;&lt;br&gt;Cámara &amp; Almacenamiento" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;shadow=1;" vertex="1" parent="group_client">
+          <mxGeometry x="30" y="180" width="180" height="80" as="geometry" />
+        </mxCell>
+
+        <!-- Contenedor Capa Backend -->
+        <mxCell id="group_back" value="Capa de Servidor (Backend Business Logic)" style="swimlane;whiteSpace=wrap;html=1;fillColor=#f5f5f5;strokeColor=#666666;fontStyle=1;fontSize=14;" vertex="1" parent="1">
+          <mxGeometry x="340" y="80" width="300" height="400" as="geometry" />
+        </mxCell>
+        <mxCell id="be_rest" value="&lt;b&gt;Spring Boot REST API&lt;/b&gt;&lt;br&gt;Controladores &amp; Endpoints HTTP" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;shadow=1;" vertex="1" parent="group_back">
+          <mxGeometry x="30" y="50" width="240" height="80" as="geometry" />
+        </mxCell>
+        <mxCell id="be_service" value="&lt;b&gt;Servicios de Negocio&lt;/b&gt;&lt;br&gt;Cálculo de Costos &amp; Reglas Comerciales" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;shadow=1;" vertex="1" parent="group_back">
+          <mxGeometry x="30" y="180" width="240" height="80" as="geometry" />
+        </mxCell>
+        <mxCell id="be_jpa" value="&lt;b&gt;Spring Data JPA / Hibernate&lt;/b&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;shadow=1;" vertex="1" parent="group_back">
+          <mxGeometry x="30" y="290" width="240" height="60" as="geometry" />
+        </mxCell>
+
+        <!-- Contenedor Capa Externa / Datos -->
+        <mxCell id="group_data" value="Capa de Datos y Seguridad" style="swimlane;whiteSpace=wrap;html=1;fillColor=#f5f5f5;strokeColor=#666666;fontStyle=1;fontSize=14;" vertex="1" parent="1">
+          <mxGeometry x="700" y="80" width="260" height="400" as="geometry" />
+        </mxCell>
+        <mxCell id="auth_sup" value="&lt;b&gt;Supabase Auth&lt;/b&gt;&lt;br&gt;Emisión y Validación JWT" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffe6cc;strokeColor=#d79b00;shadow=1;" vertex="1" parent="group_data">
+          <mxGeometry x="30" y="50" width="200" height="80" as="geometry" />
+        </mxCell>
+        <mxCell id="db_sql" value="&lt;b&gt;Base de Datos Relacional&lt;/b&gt;&lt;br&gt;PostgreSQL (Insumos, Recetas, Pedidos)" style="shape=cylinder3;whiteSpace=wrap;html=1;boundedLbl=1;backgroundBackground=1;size=15;fillColor=#f8cecc;strokeColor=#b85450;shadow=1;" vertex="1" parent="group_data">
+          <mxGeometry x="30" y="180" width="200" height="110" as="geometry" />
+        </mxCell>
+
+        <!-- Conexiones con estilo profesional -->
+        <mxCell id="c1" value="HTTPS / REST (JSON)" style="endArrow=classic;startArrow=classic;html=1;rounded=1;entryX=0;entryY=0.5;exitX=1;exitY=0.35;strokeWidth=2;" edge="1" parent="1" source="ui_ionic" target="be_rest">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="c2" value="Token JWT" style="endArrow=classic;html=1;rounded=1;exitX=0.5;exitY=0;entryX=0;entryY=0.5;strokeWidth=2;dashed=1;" edge="1" parent="1" source="be_rest" target="auth_sup">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="520" y="50" />
+              <mxPoint x="730" y="50" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="c3" value="JDBC / HikariCP" style="endArrow=classic;startArrow=classic;html=1;rounded=1;exitX=1;exitY=0.75;entryX=0;entryY=0.5;strokeWidth=2;" edge="1" parent="1" source="be_jpa" target="db_sql">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="670" y="410" />
+              <mxPoint x="670" y="295" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>
