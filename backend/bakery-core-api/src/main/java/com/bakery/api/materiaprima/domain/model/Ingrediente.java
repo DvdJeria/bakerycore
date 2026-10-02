@@ -12,14 +12,14 @@ public class Ingrediente {
     private UnidadMedida unidadMedida;
     private boolean isDeleted;
 
-    public Ingrediente(UUID id, String nombre, BigDecimal precio, Integer cantidadBase) {
+    public Ingrediente(UUID id, String nombre, BigDecimal precio, Integer cantidadBase, UnidadMedida unidadMedida) {
         validarReglasNegocio(nombre, precio, cantidadBase, unidadMedida);
         this.id = id;
         this.nombre = nombre;
         this.precio = precio;
         this.cantidadBase = cantidadBase;
         this.unidadMedida = unidadMedida;
-        this.isDeleted = isDeleted;
+        this.isDeleted = false;
     }
 
     public void actualizarDatos(String nuevoNombre, BigDecimal nuevoPrecio, Integer nuevaCantidadBase, UnidadMedida nuevaUnidadMedida) {

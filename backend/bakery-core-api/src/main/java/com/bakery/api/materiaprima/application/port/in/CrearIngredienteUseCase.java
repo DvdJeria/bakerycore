@@ -1,4 +1,7 @@
 package com.bakery.api.materiaprima.application.port.in;
 
-public class CrearIngredienteUseCase {
+import com.bakery.api.materiaprima.domain.model.Ingrediente;
+
+public interface CrearIngredienteUseCase {
+    Ingrediente create(Ingrediente ingrediente);
 }

@@ -1,4 +1,7 @@
 package com.bakery.api.materiaprima.application.port.in;
 
-public class EliminarIngredienteUseCase {
+import java.util.UUID;
+
+public interface EliminarIngredienteUseCase {
+    void eliminar(UUID id);
 }
