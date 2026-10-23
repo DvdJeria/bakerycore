@@ -1,0 +1,46 @@
+<ion-content class="ion-padding" color="light">
+  <div style="display: flex; flex-direction: column; justify-content: center; height: 100%; max-width: 400px; margin: 0 auto;">
+
+    <div class="ion-text-center ion-margin-bottom">
+      <h1 style="font-weight: bold; color: var(--ion-color-primary);">BakeryCore</h1>
+      <p style="color: #666666;);">Gestión para tu repostería</p>
+    </div>
+
+    <ion-card style="box-shadow: 0 4px 16px rgba(0,0,0,0.08); border-radius: 12px;">
+      <ion-card-content>
+        <form (ngSubmit)="onLogin()">
+
+          <ion-item fill="solid" class="ion-margin-bottom" style="border-radius: 8px;">
+            <ion-input
+              label="Correo electrónico"
+              labelPlacement="stacked"
+              type="email"
+              [(ngModel)]="email"
+              name="email"
+              [required]="true"
+              placeholder="">
+            </ion-input>
+          </ion-item>
+
+          <ion-item fill="solid" class="ion-margin-bottom" style="border-radius: 8px;">
+            <ion-input
+              label="Contraseña"
+              labelPlacement="stacked"
+              type="password"
+              [(ngModel)]="password"
+              name="password"
+              [required]="true"
+              placeholder="">
+            </ion-input>
+          </ion-item>
+
+          <ion-button expand="block" type="submit" class="ion-margin-top" style="height: 48px; font-weight: 600;">
+            Iniciar Sesión
+          </ion-button>
+
+        </form>
+      </ion-card-content>
+    </ion-card>
+
+  </div>
+</ion-content>

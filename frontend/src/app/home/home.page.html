@@ -1,0 +1,46 @@
+<ion-header>
+  <ion-toolbar color="primary">
+    <ion-buttons slot="start">
+      <ion-menu-button></ion-menu-button>
+    </ion-buttons>
+    <ion-title>Recetario BakeryCore</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content class="ion-padding">
+
+  <!-- Buscador rápido de recetas -->
+  <ion-searchbar placeholder="Buscar receta (ej. Torta de zanahoria)..." class="ion-margin-bottom"></ion-searchbar>
+
+  <!-- Listado de Recetas -->
+  <ion-grid>
+    <ion-row>
+      <!-- Ejemplo de tarjeta de receta -->
+      <ion-col size="12" size-md="6" size-lg="4" *ngFor="let receta of recetas">
+        <ion-card style="border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.06);">
+          <ion-card-header>
+            <ion-card-title style="font-weight: bold; color: var(--ion-color-primary);">{{ receta.nombre }}</ion-card-title>
+            <ion-card-subtitle>Rendimiento: {{ receta.rendimiento }} porciones</ion-card-subtitle>
+          </ion-card-header>
+
+          <ion-card-content>
+            <p style="color: #666; margin-bottom: 15px;">{{ receta.descripcion || 'Sin descripción detallada.' }}</p>
+
+            <div style="display: flex; justify-content: space-between; align-items: center;">
+              <span style="font-weight: 600; color: #333;">Costo total: ${{ receta.costo_total | number }}</span>
+              <ion-button size="small" fill="outline">Ver Detalle</ion-button>
+            </div>
+          </ion-card-content>
+        </ion-card>
+      </ion-col>
+    </ion-row>
+  </ion-grid>
+
+  <!-- Botón flotante para agregar nueva receta -->
+  <ion-fab vertical="bottom" horizontal="end" slot="fixed">
+    <ion-fab-button color="primary">
+      <ion-icon name="add"></ion-icon>
+    </ion-fab-button>
+  </ion-fab>
+
+</ion-content>
