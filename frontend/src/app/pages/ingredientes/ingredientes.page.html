@@ -1,0 +1,146 @@
+<ion-header>
+  <ion-toolbar color="primary">
+    <ion-buttons slot="start">
+      <ion-menu-button></ion-menu-button>
+    </ion-buttons>
+    <ion-title>Gestión de Ingredientes</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content class="ion-padding">
+
+  <!-- Buscador -->
+  <ion-searchbar
+    [(ngModel)]="textoBuscar"
+    (ionInput)="filtrarIngredientes()"
+    placeholder="Buscar ingrediente..."
+    class="ion-margin-bottom">
+  </ion-searchbar>
+
+  <!-- Listado en Tarjetas con @for -->
+  <ion-grid>
+    <ion-row>
+      @for (item of ingredientesFiltrados; track item.ing_id) {
+        <ion-col size="12" size-md="6" size-lg="4">
+          <ion-card style="border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.06);">
+            <ion-card-header>
+              <ion-card-title style="font-weight: bold; color: var(--ion-color-primary);">
+                {{ item.ing_nombre }}
+              </ion-card-title>
+            </ion-card-header>
+
+            <ion-card-content>
+
+              <ion-card-subtitle>
+                Precio: ${{ item.ing_precio | number }}
+                <b>{{ item.unidad_medida?.unmed_nombre || item.unidad_medida?.[0]?.unmed_nombre }}</b>
+              </ion-card-subtitle>
+
+              <div style="display: flex; justify-content: flex-end; gap: 8px;">
+                <ion-button size="small" fill="outline" color="medium" (click)="abrirModalEditar(item)">
+                  <ion-icon name="create-outline" slot="start"></ion-icon>
+                  Editar
+                </ion-button>
+                <ion-button size="small" fill="solid" color="danger" (click)="eliminarIngrediente(item.ing_id)">
+                  <ion-icon name="trash-outline" slot="start"></ion-icon>
+                  Eliminar
+                </ion-button>
+              </div>
+            </ion-card-content>
+          </ion-card>
+        </ion-col>
+      } @empty {
+        <ion-col size="12">
+          <div class="ion-text-center ion-padding" style="color: #888;">
+            <p>No se encontraron ingredientes registrados.</p>
+          </div>
+        </ion-col>
+      }
+    </ion-row>
+  </ion-grid>
+
+  <!-- Botón Flotante para Agregar -->
+  <ion-fab vertical="bottom" horizontal="end" slot="fixed">
+    <ion-fab-button color="primary" (click)="abrirModalCrear()">
+      <ion-icon name="add"></ion-icon>
+    </ion-fab-button>
+  </ion-fab>
+
+  <!-- MODAL CREAR / EDITAR INGREDIENTE -->
+  <ion-modal [isOpen]="isModalOpen" (didDismiss)="cerrarModal()">
+    <ng-template>
+      <ion-header>
+        <ion-toolbar color="primary">
+          <ion-title>{{ isEditMode ? 'Editar Ingrediente' : 'Nuevo Ingrediente' }}</ion-title>
+          <ion-buttons slot="end">
+            <ion-button (click)="cerrarModal()">
+              <ion-icon name="close-outline" slot="icon-only"></ion-icon>
+            </ion-button>
+          </ion-buttons>
+        </ion-toolbar>
+      </ion-header>
+
+      <ion-content class="ion-padding">
+        <div style="max-width: 500px; margin: 0 auto;">
+
+          <!-- Nombre -->
+          <ion-item class="ion-margin-bottom" style="border-radius: 8px;">
+            <ion-input
+              label="Nombre del Ingrediente"
+              labelPlacement="stacked"
+              [(ngModel)]="currentIngrediente.ing_nombre"
+              placeholder="Ej. Harina sin polvos">
+            </ion-input>
+          </ion-item>
+
+          <!-- Precio -->
+          <ion-item class="ion-margin-bottom" style="border-radius: 8px;">
+            <ion-input
+              type="number"
+              label="Precio ($)"
+              labelPlacement="stacked"
+              [(ngModel)]="currentIngrediente.ing_precio"
+              placeholder="0.00">
+            </ion-input>
+          </ion-item>
+
+          <!-- Unidad de Medida con @for y evento ionChange -->
+          <ion-item class="ion-margin-bottom" style="border-radius: 8px;">
+            <ion-select
+              label="Unidad de Medida"
+              labelPlacement="stacked"
+              [(ngModel)]="currentIngrediente.unmed_id"
+              (ionChange)="onUnidadCambiada()"
+              placeholder="Seleccione unidad">
+              @for (unidad of unidadesMedida; track unidad.unmed_id) {
+                <ion-select-option [value]="unidad.unmed_id">
+                  {{ unidad.unmed_nombre }}
+                </ion-select-option>
+              }
+            </ion-select>
+          </ion-item>
+
+          <!-- Cantidad Base (Se bloquea automáticamente si la unidad es "Unidad") -->
+          <ion-item class="ion-margin-bottom" style="border-radius: 8px;">
+            <ion-input
+              type="number"
+              label="Cantidad Base"
+              labelPlacement="stacked"
+              [(ngModel)]="currentIngrediente.ing_cantidad_base"
+              [readonly]="esUnidadSeleccionada"
+              [helperText]="esUnidadSeleccionada ? 'Fijo en 1 para elementos unitarios' : ''"
+              placeholder="1">
+            </ion-input>
+          </ion-item>
+
+          <!-- Botón Guardar -->
+          <ion-button expand="block" color="primary" class="ion-margin-top" (click)="guardarIngrediente()">
+            {{ isEditMode ? 'Guardar Cambios' : 'Crear Ingrediente' }}
+          </ion-button>
+
+        </div>
+      </ion-content>
+    </ng-template>
+  </ion-modal>
+
+</ion-content>

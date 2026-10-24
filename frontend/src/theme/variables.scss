@@ -1,2 +1,5 @@
-// For information on how to create your own theme, please refer to:
-// https://ionicframework.com/docs/theming/
+:root {
+  /* Le decimos a Ionic que use el color primario de tu tema Rose de Angular Material */
+  --ion-color-primary: var(--mat-sys-primary) !important;
+  --ion-color-primary-rgb: var(--mat-sys-primary-rgb) !important;
+}

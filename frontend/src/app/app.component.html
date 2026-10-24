@@ -9,34 +9,50 @@
 
     <ion-content>
       <ion-list>
+
+        <!-- Recetario -->
         <ion-menu-toggle auto-hide="false">
           <ion-item routerLink="/home" routerDirection="root" lines="none">
             <ion-icon slot="start" name="book-outline"></ion-icon>
             <ion-label>Recetario</ion-label>
           </ion-item>
+        </ion-menu-toggle>
 
+        <!-- Calendario de Pedidos -->
+        <ion-menu-toggle auto-hide="false">
           <ion-item routerLink="/pedidos" routerDirection="root" lines="none">
             <ion-icon slot="start" name="calendar-outline"></ion-icon>
             <ion-label>Calendario de Pedidos</ion-label>
           </ion-item>
+        </ion-menu-toggle>
 
+        <!-- Cotizaciones -->
+        <ion-menu-toggle auto-hide="false">
           <ion-item routerLink="/cotizaciones" routerDirection="root" lines="none">
             <ion-icon slot="start" name="calculator-outline"></ion-icon>
             <ion-label>Cotizaciones</ion-label>
           </ion-item>
+        </ion-menu-toggle>
 
+        <!-- Clientes -->
+        <ion-menu-toggle auto-hide="false">
           <ion-item routerLink="/clientes" routerDirection="root" lines="none">
             <ion-icon slot="start" name="people-outline"></ion-icon>
-            <ion-label>Clientes</ion-label>
-          </ion-item>
-
-          <ion-item routerLink="/ingredientes" routerDirection="root" lines="none">
-            <ion-icon slot="start" name="cube-outline"></ion-icon>
-            <ion-label>Materia Prima</ion-label>
+              <ion-label>Clientes</ion-label>
           </ion-item>
         </ion-menu-toggle>
+
+        <!-- Ingredientes -->
+        <ion-menu-toggle auto-hide="false">
+          <ion-item routerLink="/ingredientes" routerDirection="root" lines="none">
+            <ion-icon slot="start" name="cube-outline"></ion-icon>
+            <ion-label>Ingredientes</ion-label>
+          </ion-item>
+        </ion-menu-toggle>
+
       </ion-list>
     </ion-content>
+
   </ion-menu>
 
   <!-- Contenido principal de la app -->
