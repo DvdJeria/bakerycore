@@ -1,51 +1,116 @@
-<ion-header>
+<ion-header [translucent]="true">
   <ion-toolbar color="primary">
     <ion-buttons slot="start">
       <ion-menu-button></ion-menu-button>
     </ion-buttons>
-    <ion-title>Recetario BakeryCore</ion-title>
-
-    <ion-buttons slot="end">
-      <ion-button (click)="cerrarSesion()" title="Cerrar Sesión">
-        <ion-icon name="log-out-outline" slot="icon-only"></ion-icon>
-      </ion-button>
-    </ion-buttons>
-
+    <ion-title>Cuaderno de Recetas</ion-title>
   </ion-toolbar>
 </ion-header>
 
-<ion-content class="ion-padding">
+<ion-content [fullscreen]="true" class="ion-padding">
 
-  <!-- Buscador rápido de recetas -->
-  <ion-searchbar placeholder="" class="ion-margin-bottom"></ion-searchbar>
+  <!-- Título de sección limpio y ordenado -->
+  <div class="ion-margin-vertical">
+    <h1 style="font-size: 26px; font-weight: bold; color: var(--ion-color-dark, #222);">Mis Recetas</h1>
+  </div>
 
-  <!-- Listado de Recetas -->
-  <ion-grid>
-    <ion-row>
-      <!-- Ejemplo de tarjeta de receta -->
-      <ion-col size="12" size-md="6" size-lg="4" *ngFor="let receta of recetas">
-        <ion-card style="border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.06);">
-          <ion-card-header>
-            <ion-card-title style="font-weight: bold; color: var(--ion-color-primary);">{{ receta.nombre }}</ion-card-title>
-            <ion-card-subtitle>Rendimiento: {{ receta.rendimiento }} porciones</ion-card-subtitle>
-          </ion-card-header>
+  <!-- Spinner de carga -->
+  @if (isLoading) {
+    <div class="ion-text-center ion-padding">
+      <ion-spinner name="crescent" color="primary"></ion-spinner>
+      <p style="color: #666; margin-top: 10px;">Cargando recetas...</p>
+    </div>
+  }
 
-          <ion-card-content>
-            <p style="color: #666; margin-bottom: 15px;">{{ receta.descripcion || 'Sin descripción detallada.' }}</p>
+  <!-- Mensaje si no hay registros y YA TERMINÓ de cargar -->
+  @if (!isLoading && recetas.length === 0) {
+    <div class="ion-text-center ion-padding">
+      <ion-icon name="fast-food-outline" size="large" color="medium"></ion-icon>
+      <p style="color: #666; margin-top: 10px;">No hay recetas registradas todavía. ¡Toca el botón '+' para agregar la primera!</p>
+    </div>
+  }
 
-            <div style="display: flex; justify-content: space-between; align-items: center;">
-              <span style="font-weight: 600; color: #333;">Costo total: ${{ receta.costo_total | number }}</span>
-              <ion-button size="small" fill="outline">Ver Detalle</ion-button>
+  <!-- Listado con efecto deslizante y diseño de tarjetas moderno -->
+  @if (!isLoading && recetas.length > 0) {
+    <ion-list lines="none" class="recipe-list">
+      @for (receta of recetas; track receta.rec_id) {
+        <ion-item-sliding class="ion-margin-bottom">
+
+          <!-- Contenido visible con diseño de tarjeta limpia -->
+          <ion-item class="recipe-card-item">
+            <div class="recipe-card-content">
+
+              <!-- Cabecera de la tarjeta: Icono + Nombre + Fecha -->
+              <div class="recipe-header">
+                <div class="recipe-icon-container">
+                  <ion-icon name="fast-food-outline" class="recipe-main-icon"></ion-icon>
+                </div>
+                <div class="recipe-titles">
+                  <h2><strong>{{ receta.rec_nombre }}</strong></h2>
+                  <p><ion-text color="medium">Creada el {{ receta.rec_fecha_creacion | date:'dd/MM/yyyy' }}</ion-text></p>
+                </div>
+              </div>
+
+              <!-- Acordeón estilizado e integrado -->
+              <ion-accordion-group class="custom-accordion-group">
+                <ion-accordion value="detalles">
+                  <ion-item slot="header" lines="none" class="accordion-header-item">
+                    <ion-label>Ver Receta e Ingredientes</ion-label>
+                  </ion-item>
+
+                  <div class="accordion-body-content" slot="content">
+
+                    <!-- Instrucciones -->
+                    @if (receta.rec_instrucciones) {
+                      <div class="section-block">
+                        <h4><ion-icon name="book-outline"></ion-icon> Observaciones</h4>
+                        <p class="text-instructions">{{ receta.rec_instrucciones }}</p>
+                      </div>
+                    }
+
+                    <!-- Lista de Ingredientes -->
+                    <div class="section-block">
+                      <h4><ion-icon name="basket-outline"></ion-icon> Ingredientes necesarios</h4>
+
+                      @if (receta.receta_detalle && receta.receta_detalle.length > 0) {
+                        <ul class="ingredients-list">
+                          @for (det of receta.receta_detalle; track det.ing_id) {
+                            <li>
+                              <span class="ing-name">{{ det.ingredientes?.ing_nombre || 'Ingrediente' }}</span>
+                              <span class="ing-qty">{{ det.cantidad_necesaria }} {{ det.ingredientes?.unidad_medida?.unmed_nombre || '' }}</span>
+                            </li>
+                          }
+                        </ul>
+                      } @else {
+                        <p class="no-ingredients">No hay ingredientes asociados.</p>
+                      }
+                    </div>
+
+                  </div>
+                </ion-accordion>
+              </ion-accordion-group>
+
             </div>
-          </ion-card-content>
-        </ion-card>
-      </ion-col>
-    </ion-row>
-  </ion-grid>
+          </ion-item>
 
-  <!-- Botón flotante para agregar nueva receta -->
+          <!-- Botones ocultos al deslizar la tarjeta -->
+          <ion-item-options side="end">
+            <ion-item-option color="primary" (click)="abrirModalReceta(receta)">
+              <ion-icon slot="icon-only" name="create-outline"></ion-icon>
+            </ion-item-option>
+            <ion-item-option color="danger" (click)="confirmarEliminacion(receta)">
+              <ion-icon slot="icon-only" name="trash-outline"></ion-icon>
+            </ion-item-option>
+          </ion-item-options>
+
+        </ion-item-sliding>
+      }
+    </ion-list>
+  }
+
+  <!-- Botón flotante inferior derecho para agregar -->
   <ion-fab vertical="bottom" horizontal="end" slot="fixed">
-    <ion-fab-button color="primary">
+    <ion-fab-button (click)="abrirModalReceta()" color="primary">
       <ion-icon name="add"></ion-icon>
     </ion-fab-button>
   </ion-fab>
