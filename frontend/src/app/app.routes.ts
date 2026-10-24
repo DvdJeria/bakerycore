@@ -16,5 +16,9 @@ export const routes: Routes = [
     loadComponent: () => import('./home/home.page').then(m => m.HomePage),
     canActivate: [authGuard] // <--- ¡Ruta protegida!
   },
-  // Aquí iremos agregando el resto de tus módulos (clientes, pedidos, ingredientes) con el guard
+  {
+    path: 'ingredientes',
+    loadComponent: () => import('./pages/ingredientes/ingredientes.page').then( m => m.IngredientesPage),
+    canActivate: [authGuard]
+  },
 ];

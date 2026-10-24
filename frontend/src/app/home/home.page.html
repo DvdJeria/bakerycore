@@ -4,13 +4,20 @@
       <ion-menu-button></ion-menu-button>
     </ion-buttons>
     <ion-title>Recetario BakeryCore</ion-title>
+
+    <ion-buttons slot="end">
+      <ion-button (click)="cerrarSesion()" title="Cerrar Sesión">
+        <ion-icon name="log-out-outline" slot="icon-only"></ion-icon>
+      </ion-button>
+    </ion-buttons>
+
   </ion-toolbar>
 </ion-header>
 
 <ion-content class="ion-padding">
 
   <!-- Buscador rápido de recetas -->
-  <ion-searchbar placeholder="Buscar receta (ej. Torta de zanahoria)..." class="ion-margin-bottom"></ion-searchbar>
+  <ion-searchbar placeholder="" class="ion-margin-bottom"></ion-searchbar>
 
   <!-- Listado de Recetas -->
   <ion-grid>

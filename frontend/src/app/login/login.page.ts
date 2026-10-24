@@ -8,7 +8,8 @@ import {
   IonCardContent,
   IonItem,
   IonInput,
-  IonButton
+  IonButton,
+  ToastController
 } from '@ionic/angular';
 import { SupabaseService } from '../services/supabase';
 
@@ -28,21 +29,43 @@ import { SupabaseService } from '../services/supabase';
     IonButton
   ]
 })
+
 export class LoginPage implements OnInit {
+
   // Inyección de dependencias moderna con inject()
   private supabaseService = inject(SupabaseService);
   private router = inject(Router);
+  private toastController = inject(ToastController);
 
   email: string = '';
   password: string = '';
+  cargando: boolean = false;
+
+  async mostrarMensaje(mensaje: string, color: 'danger' | 'warning' | 'success' = 'danger') {
+    const toast = await this.toastController.create({
+      message: mensaje,
+      duration: 3500,
+      color: color,
+      position: 'bottom',
+      buttons: [
+        {
+          text: 'OK',
+          role: 'cancel'
+        }
+      ]
+    });
+    await toast.present();
+  }
 
   async ngOnInit() {}
 
   async onLogin() {
     if (!this.email || !this.password) {
-      console.warn('Por favor ingresa correo y contraseña');
+      await this.mostrarMensaje('Por favor ingresa tu correo y contraseña.', 'warning');
       return;
     }
+
+    this.cargando = true;
 
     try {
       const { data, error } = await this.supabaseService.client.auth.signInWithPassword({
@@ -51,13 +74,22 @@ export class LoginPage implements OnInit {
       });
 
       if (error) {
-        console.error('Error al iniciar sesión:', error.message);
-      } else {
-        console.log('¡Inicio de sesión exitoso!', data);
-        this.router.navigate(['/home']);
+        // Mapeo de errores comunes para mostrar un mensaje claro al usuario
+        if (error.message.includes('Invalid login credentials')) {
+          await this.mostrarMensaje('Correo o contraseña incorrectos. Revisa tus datos e intenta nuevamente.');
+        } else {
+          await this.mostrarMensaje(`Error al iniciar sesión: ${error.message}`);
+        }
+      } else if (data.session) {
+        await this.mostrarMensaje('¡Bienvenido a BakeryCore!', 'success');
+        this.router.navigate(['/home'], { replaceUrl: true });
       }
     } catch (err) {
-      console.error('Error inesperado:', err);
+      console.error('Error inesperado al iniciar sesión:', err);
+      await this.mostrarMensaje('Ocurrió un error inesperado al conectar con el servidor.');
+    } finally {
+      this.cargando = false;
     }
   }
+
 }
