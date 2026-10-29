@@ -1,20 +1,42 @@
-.ingredient-section {
-  background: #f8f9fa;
+.search-dropdown-list {
+  max-height: 180px;
+  overflow-y: auto;
+  background: #ffffff;
+  border: 1px solid #dcdcdc;
   border-radius: 8px;
-  padding: 12px;
-  border: 1px solid #e9ecef;
+  margin-bottom: 12px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.08);
 
-  h3 {
-    font-size: 1.1rem;
-    font-weight: 600;
-    color: var(--ion-color-dark);
-    margin-bottom: 10px;
+  .search-dropdown-item {
+    padding: 10px 14px;
+    border-bottom: 1px solid #f0f0f0;
+    cursor: pointer;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+
+    &:hover {
+      background: #f8f9fa;
+    }
+
+    strong {
+      font-size: 0.9rem;
+      color: #333;
+    }
+
+    .dropdown-sub {
+      font-size: 0.78rem;
+      color: #666;
+    }
   }
 }
 
-.item-card {
-  --background: #ffffff;
-  border-radius: 6px;
-  box-shadow: 0 1px 3px rgba(0,0,0,0.05);
-  border: 1px solid #f0f0f0;
+.selected-badge-box {
+  background: #f0f4f8;
+  border: 1px solid #d0e1f9;
+  border-radius: 8px;
+  padding: 10px 14px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
 }

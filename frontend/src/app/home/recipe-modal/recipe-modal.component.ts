@@ -1,14 +1,14 @@
-import { Component, Input, OnInit, inject } from '@angular/core';
+import { Component, Input, OnInit, inject, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import {
   IonHeader, IonToolbar, IonTitle, IonContent, IonButtons,
-  IonButton, IonItem, IonInput, IonTextarea, IonSelect, IonSelectOption,
-  IonList, IonLabel, IonIcon, IonGrid, IonRow, IonCol,
+  IonButton, IonItem, IonInput, IonTextarea,
+  IonList, IonLabel, IonIcon, IonCard, IonCardContent, IonSearchbar,
   ModalController, ToastController, LoadingController
 } from '@ionic/angular';
 import { addIcons } from 'ionicons';
-import { closeOutline, trashOutline, addOutline } from 'ionicons/icons';
+import { closeOutline, trashOutline, addOutline, searchOutline } from 'ionicons/icons';
 import { SupabaseService } from '../../services/supabase';
 
 @Component({
@@ -18,8 +18,8 @@ import { SupabaseService } from '../../services/supabase';
   standalone: true,
   imports: [
     CommonModule, FormsModule, IonHeader, IonToolbar, IonTitle, IonContent,
-    IonButtons, IonButton, IonItem, IonInput, IonTextarea, IonSelect,
-    IonSelectOption, IonList, IonLabel, IonIcon, IonGrid, IonRow, IonCol
+    IonButtons, IonButton, IonItem, IonInput, IonTextarea,
+    IonList, IonLabel, IonIcon, IonCard, IonCardContent, IonSearchbar
   ]
 })
 export class RecipeModalComponent implements OnInit {
@@ -27,6 +27,7 @@ export class RecipeModalComponent implements OnInit {
   private supabaseService = inject(SupabaseService);
   private toastController = inject(ToastController);
   private loadingController = inject(LoadingController);
+  private cdr = inject(ChangeDetectorRef);
 
   @Input() receta: any = null; // Si viene con datos, estamos editando
 
@@ -34,21 +35,24 @@ export class RecipeModalComponent implements OnInit {
   rec_nombre: string = '';
   rec_instrucciones: string = '';
 
-  // Catálogo completo de ingredientes obtenidos de la BD
+  // Catálogo completo y filtrado para el buscador
   ingredientesDisponibles: any[] = [];
+  ingredientesFiltrados: any[] = [];
+  searchTerm: string = '';
 
   // Lista de ingredientes seleccionados para esta receta
   ingredientesSeleccionados: { ing_id: string; ing_nombre: string; cantidad_necesaria: number; unmed_nombre?: string }[] = [];
 
-  // Controles temporales para el formulario de selección individual
-  tempIngId: string = '';
-  tempCantidad: number | null = null;
+  // Controles temporales para la selección individual mediante el buscador
+  ingredienteSeleccionadoTemp: any = null;
+  tempCantidad: number | null = 1;
 
   constructor() {
     addIcons({
       'close-outline': closeOutline,
       'trash-outline': trashOutline,
-      'add-outline': addOutline
+      'add-outline': addOutline,
+      'search-outline': searchOutline
     });
   }
 
@@ -74,6 +78,7 @@ export class RecipeModalComponent implements OnInit {
       this.mostrarToast('No se pudieron cargar los ingredientes', 'danger');
     } else {
       this.ingredientesDisponibles = data || [];
+      this.ingredientesFiltrados = [...this.ingredientesDisponibles];
     }
   }
 
@@ -95,10 +100,38 @@ export class RecipeModalComponent implements OnInit {
     }
   }
 
+  filtrarIngredientes(event: any) {
+    const texto = event.target.value ? event.target.value.toLowerCase() : '';
+    this.searchTerm = texto;
+
+    if (!texto.trim()) {
+      this.ingredientesFiltrados = [...this.ingredientesDisponibles];
+    } else {
+      this.ingredientesFiltrados = this.ingredientesDisponibles.filter(item =>
+        item.ing_nombre.toLowerCase().includes(texto)
+      );
+    }
+    this.cdr.detectChanges();
+  }
+
+  seleccionarIngrediente(ing: any) {
+    this.ingredienteSeleccionadoTemp = ing;
+    this.searchTerm = ing.ing_nombre;
+    this.ingredientesFiltrados = [];
+    this.cdr.detectChanges();
+  }
+
+  limpiarSeleccionTemp() {
+    this.ingredienteSeleccionadoTemp = null;
+    this.searchTerm = '';
+    this.ingredientesFiltrados = [...this.ingredientesDisponibles];
+    this.cdr.detectChanges();
+  }
+
   // Agrega un ingrediente a la lista local de la receta
   agregarIngredienteALista() {
-    if (!this.tempIngId) {
-      this.mostrarToast('Selecciona un ingrediente', 'warning');
+    if (!this.ingredienteSeleccionadoTemp) {
+      this.mostrarToast('Selecciona un ingrediente usando el buscador', 'warning');
       return;
     }
     if (!this.tempCantidad || this.tempCantidad <= 0) {
@@ -106,30 +139,30 @@ export class RecipeModalComponent implements OnInit {
       return;
     }
 
+    const ingId = this.ingredienteSeleccionadoTemp.ing_id;
+
     // Validar si ya está agregado en la lista
-    const existe = this.ingredientesSeleccionados.some(i => i.ing_id === this.tempIngId);
+    const existe = this.ingredientesSeleccionados.some(i => i.ing_id === ingId);
     if (existe) {
       this.mostrarToast('Este ingrediente ya está agregado en la receta', 'warning');
       return;
     }
 
-    const ingredienteObj = this.ingredientesDisponibles.find(i => i.ing_id === this.tempIngId);
-    if (ingredienteObj) {
-      this.ingredientesSeleccionados.push({
-        ing_id: ingredienteObj.ing_id,
-        ing_nombre: ingredienteObj.ing_nombre,
-        cantidad_necesaria: this.tempCantidad,
-        unmed_nombre: ingredienteObj.unidad_medida?.unmed_nombre || ''
-      });
+    this.ingredientesSeleccionados.push({
+      ing_id: ingId,
+      ing_nombre: this.ingredienteSeleccionadoTemp.ing_nombre,
+      cantidad_necesaria: this.tempCantidad,
+      unmed_nombre: this.ingredienteSeleccionadoTemp.unidad_medida?.unmed_nombre || ''
+    });
 
-      // Limpiar campos temporales para el siguiente
-      this.tempIngId = '';
-      this.tempCantidad = null;
-    }
+    // Limpiar campos temporales para el siguiente
+    this.limpiarSeleccionTemp();
+    this.tempCantidad = 1;
   }
 
   quitarIngrediente(ing_id: string) {
     this.ingredientesSeleccionados = this.ingredientesSeleccionados.filter(i => i.ing_id !== ing_id);
+    this.cdr.detectChanges();
   }
 
   cerrarModal() {
