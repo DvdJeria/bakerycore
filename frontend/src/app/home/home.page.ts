@@ -23,7 +23,7 @@ import { RecipeModalComponent } from './recipe-modal/recipe-modal.component';
   imports: [
     CommonModule, IonHeader, IonToolbar, IonTitle, IonContent, IonButtons,
     IonMenuButton, IonSpinner, IonList, IonItemSliding, IonItem,
-    IonThumbnail, IonLabel, IonAccordionGroup, IonAccordion,
+    IonLabel, IonAccordionGroup, IonAccordion,
     IonItemOptions, IonItemOption, IonIcon, IonFab, IonFabButton, IonText
   ]
 })

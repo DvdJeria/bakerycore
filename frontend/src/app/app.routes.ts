@@ -21,4 +21,13 @@ export const routes: Routes = [
     loadComponent: () => import('./pages/ingredientes/ingredientes.page').then( m => m.IngredientesPage),
     canActivate: [authGuard]
   },
+  {
+    path: 'clientes',
+    loadComponent: () => import('./pages/clientes/clientes.page').then( m => m.ClientesPage)
+  },
+  {
+    path: 'clientes',
+    loadComponent: () => import('./pages/clientes/clientes.page').then(m => m.ClientesPage),
+    canActivate: [authGuard]
+  }
 ];

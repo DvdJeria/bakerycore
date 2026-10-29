@@ -1,0 +1,129 @@
+<ion-header [translucent]="true">
+  <ion-toolbar color="primary">
+    <ion-buttons slot="start">
+      <ion-menu-button></ion-menu-button>
+    </ion-buttons>
+    <ion-title>Gestión de Clientes</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content [fullscreen]="true" class="ion-padding">
+
+  <!-- Título de sección -->
+  <div class="ion-margin-vertical">
+    <h1 style="font-size: 26px; font-weight: bold; color: var(--ion-color-dark, #222);">Mis Clientes</h1>
+  </div>
+
+  <!-- Spinner de carga -->
+  @if (isLoading) {
+    <div class="ion-text-center ion-padding">
+      <ion-spinner name="crescent" color="primary"></ion-spinner>
+      <p style="color: #666; margin-top: 10px;">Cargando clientes...</p>
+    </div>
+  }
+
+  <!-- Mensaje si no hay registros -->
+  @if (!isLoading && clientes.length === 0) {
+    <div class="ion-text-center ion-padding">
+      <ion-icon name="person-outline" size="large" color="medium"></ion-icon>
+      <p style="color: #666; margin-top: 10px;">No hay clientes registrados todavía. ¡Toca el botón '+' para agregar el primero!</p>
+    </div>
+  }
+
+  <!-- Listado con tarjetas modernas y control de flujo nativo -->
+  @if (!isLoading && clientes.length > 0) {
+    <ion-list lines="none" class="client-list">
+      @for (cliente of clientes; track cliente.cli_id) {
+        <ion-item-sliding class="ion-margin-bottom">
+
+          <ion-item class="client-card-item">
+            <div class="client-card-content">
+
+              <div class="client-header">
+                <div class="client-icon-container">
+                  <ion-icon name="person-outline" class="client-main-icon"></ion-icon>
+                </div>
+                <div class="client-titles">
+                  <h2><strong>{{ cliente.cli_nombre }} {{ cliente.cli_apellido }}</strong></h2>
+
+                  @if (cliente.cli_telefono) {
+                    <p class="client-info-row">
+                      <ion-icon name="call-outline"></ion-icon> <span>{{ cliente.cli_telefono }}</span>
+                    </p>
+                  }
+                  @if (cliente.cli_instagram) {
+                    <p class="client-info-row">
+                      <ion-icon name="logo-instagram"></ion-icon> <span>{{ cliente.cli_instagram }}</span>
+                    </p>
+                  }
+                </div>
+              </div>
+
+            </div>
+          </ion-item>
+
+          <!-- Opciones deslizantes para editar o aplicar soft delete -->
+          <ion-item-options side="end">
+            <ion-item-option color="primary" (click)="abrirModalCliente(cliente)">
+              <ion-icon slot="icon-only" name="create-outline"></ion-icon>
+            </ion-item-option>
+            <ion-item-option color="danger" (click)="confirmarEliminacion(cliente)">
+              <ion-icon slot="icon-only" name="trash-outline"></ion-icon>
+            </ion-item-option>
+          </ion-item-options>
+
+        </ion-item-sliding>
+      }
+    </ion-list>
+  }
+
+  <!-- Botón flotante para agregar -->
+  <ion-fab vertical="bottom" horizontal="end" slot="fixed">
+    <ion-fab-button (click)="abrirModalCliente()" color="primary">
+      <ion-icon name="add"></ion-icon>
+    </ion-fab-button>
+  </ion-fab>
+
+  <!-- Modal Inline para Crear / Editar Cliente -->
+  <ion-modal [isOpen]="isModalOpen" (didDismiss)="cerrarModal()">
+    <ng-template>
+      <ion-header>
+        <ion-toolbar color="primary">
+          <ion-title>{{ clienteSeleccionado ? 'Editar Cliente' : 'Nuevo Cliente' }}</ion-title>
+          <ion-buttons slot="end">
+            <ion-button (click)="cerrarModal()">Cerrar</ion-button>
+          </ion-buttons>
+        </ion-toolbar>
+      </ion-header>
+
+      <ion-content class="ion-padding">
+        <form [formGroup]="clientForm" (ngSubmit)="guardarCliente()">
+
+          <ion-item class="ion-margin-bottom">
+            <ion-input label="Nombre *" labelPlacement="stacked" formControlName="cli_nombre" placeholder="Ej. Sofía"></ion-input>
+          </ion-item>
+
+          <ion-item class="ion-margin-bottom">
+            <ion-input label="Apellido *" labelPlacement="stacked" formControlName="cli_apellido" placeholder="Ej. Valenzuela"></ion-input>
+          </ion-item>
+
+          <ion-item class="ion-margin-bottom">
+            <ion-input label="Teléfono" labelPlacement="stacked" formControlName="cli_telefono" placeholder="Ej. +56912345678"></ion-input>
+          </ion-item>
+
+          <ion-item class="ion-margin-bottom">
+            <ion-input label="Instagram" labelPlacement="stacked" formControlName="cli_instagram" placeholder="Ej. @sofia.pasteleria"></ion-input>
+          </ion-item>
+
+          <div class="ion-padding-top">
+            <ion-button expand="block" type="submit" color="primary" [disabled]="clientForm.invalid">
+              {{ clienteSeleccionado ? 'Actualizar Cliente' : 'Guardar Cliente' }}
+            </ion-button>
+          </div>
+
+        </form>
+      </ion-content>
+    </ng-template>
+  </ion-modal>
+
+</ion-content>
