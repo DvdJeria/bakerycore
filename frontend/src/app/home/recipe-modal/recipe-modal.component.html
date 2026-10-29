@@ -21,7 +21,7 @@
     </ion-input>
   </ion-item>
 
-  <!-- Instrucciones u observaciones (Opcional, queda en blanco si no se llena) -->
+  <!-- Instrucciones u observaciones -->
   <ion-item class="ion-margin-bottom">
     <ion-textarea
       label="Instrucciones / Observaciones (Opcional)"
@@ -32,59 +32,87 @@
     </ion-textarea>
   </ion-item>
 
-  <!-- SECCIÓN: Añadir Ingredientes a la Receta -->
+  <!-- SECCIÓN: Añadir Ingredientes a la Receta con Buscador -->
   <div class="ingredient-section ion-margin-top ion-padding-vertical">
     <h3>Ingredientes de la Receta</h3>
 
-    <ion-grid class="ion-no-padding">
-      <ion-row>
-        <!-- Selector de ingrediente -->
-        <ion-col size="12" size-md="7">
-          <ion-item lines="solid">
-            <ion-select label="Ingrediente" labelPlacement="stacked" placeholder="Seleccionar..." [(ngModel)]="tempIngId">
-              <ion-select-option *ngFor="let ing of ingredientesDisponibles" [value]="ing.ing_id">
-                {{ ing.ing_nombre }} ({{ ing.unidad_medida?.unmed_nombre }})
-              </ion-select-option>
-            </ion-select>
-          </ion-item>
-        </ion-col>
+    <ion-card class="aesthetic-card ion-margin-bottom" style="box-shadow: none; border: 1px solid #e0e0e0;">
+      <ion-card-content style="padding: 12px;">
+
+        <!-- Buscador en tiempo real -->
+        <ion-searchbar
+          [value]="searchTerm"
+          placeholder="Escribe para buscar ingrediente..."
+          (ionInput)="filtrarIngredientes($event)"
+          [animated]="true"
+          style="padding-inline: 0; margin-bottom: 8px;">
+        </ion-searchbar>
+
+        <!-- Lista desplegable filtrada en vivo con @if y @for -->
+        @if (searchTerm && ingredientesFiltrados.length > 0 && !ingredienteSeleccionadoTemp) {
+          <div class="search-dropdown-list">
+            @for (ing of ingredientesFiltrados; track ing.ing_id) {
+              <div class="search-dropdown-item" (click)="seleccionarIngrediente(ing)">
+                <strong>{{ ing.ing_nombre }}</strong>
+                <span class="dropdown-sub">{{ ing.unidad_medida?.unmed_nombre }}</span>
+              </div>
+            }
+          </div>
+        }
+
+        <!-- Tarjeta indicadora del ingrediente seleccionado -->
+        @if (ingredienteSeleccionadoTemp) {
+          <div class="selected-badge-box ion-margin-bottom">
+            <div>
+              <span style="font-size: 0.75rem; color: #666; display: block;">Ingrediente seleccionado:</span>
+              <strong style="color: var(--ion-color-primary); font-size: 0.95rem;">{{ ingredienteSeleccionadoTemp.ing_nombre }}</strong>
+              <span style="font-size: 0.8rem; color: #555; display: block;">Unidad: {{ ingredienteSeleccionadoTemp.unidad_medida?.unmed_nombre }}</span>
+            </div>
+            <ion-button size="small" fill="clear" color="medium" (click)="limpiarSeleccionTemp()">
+              Cambiar
+            </ion-button>
+          </div>
+        }
 
         <!-- Input de cantidad -->
-        <ion-col size="12" size-md="5">
-          <ion-item lines="solid">
-            <ion-input
-              type="number"
-              label="Cantidad"
-              labelPlacement="stacked"
-              placeholder="Ej: 500"
-              [(ngModel)]="tempCantidad">
-            </ion-input>
-          </ion-item>
-        </ion-col>
-      </ion-row>
-    </ion-grid>
+        <ion-item lines="none" class="ion-margin-bottom" style="border: 1px solid #ddd; border-radius: 8px;">
+          <ion-input
+            type="number"
+            label="Cantidad"
+            labelPlacement="stacked"
+            placeholder="Ej: 500"
+            [(ngModel)]="tempCantidad">
+          </ion-input>
+        </ion-item>
 
-    <!-- Botón para añadir este ingrediente a la lista temporal -->
-    <ion-button expand="block" color="secondary" class="ion-margin-top" (click)="agregarIngredienteALista()">
-      <ion-icon name="add-outline" slot="start"></ion-icon>
-      Añadir a la receta
-    </ion-button>
+        <!-- Botón para añadir este ingrediente a la lista temporal -->
+        <ion-button expand="block" color="secondary" (click)="agregarIngredienteALista()" [disabled]="!ingredienteSeleccionadoTemp">
+          <ion-icon name="add-outline" slot="start"></ion-icon>
+          Añadir a la receta
+        </ion-button>
+
+      </ion-card-content>
+    </ion-card>
   </div>
 
   <!-- LISTADO DE INGREDIENTES AÑADIDOS -->
-  <div class="ion-margin-top" *ngIf="ingredientesSeleccionados.length > 0">
-    <h4>Ingredientes agregados ({{ ingredientesSeleccionados.length }})</h4>
-    <ion-list>
-      <ion-item *ngFor="let item of ingredientesSeleccionados" class="ion-margin-bottom item-card">
-        <ion-label>
-          <h2><strong>{{ item.ing_nombre }}</strong></h2>
-          <p>Cantidad necesaria: <strong>{{ item.cantidad_necesaria }} {{ item.unmed_nombre }}</strong></p>
-        </ion-label>
-        <ion-button fill="clear" color="danger" slot="end" (click)="quitarIngrediente(item.ing_id)">
-          <ion-icon name="trash-outline" slot="icon-only"></ion-icon>
-        </ion-button>
-      </ion-item>
-    </ion-list>
+  <div class="ion-margin-top">
+    @if (ingredientesSeleccionados.length > 0) {
+      <h4>Ingredientes agregados ({{ ingredientesSeleccionados.length }})</h4>
+      <ion-list>
+        @for (item of ingredientesSeleccionados; track item.ing_id) {
+          <ion-item class="ion-margin-bottom item-card" style="border: 1px solid #eee; border-radius: 10px;">
+            <ion-label>
+              <h2><strong>{{ item.ing_nombre }}</strong></h2>
+              <p>Cantidad necesaria: <strong>{{ item.cantidad_necesaria }} {{ item.unmed_nombre }}</strong></p>
+            </ion-label>
+            <ion-button fill="clear" color="danger" slot="end" (click)="quitarIngrediente(item.ing_id)">
+              <ion-icon name="trash-outline" slot="icon-only"></ion-icon>
+            </ion-button>
+          </ion-item>
+        }
+      </ion-list>
+    }
   </div>
 
   <!-- Botón Global para Guardar la Receta -->

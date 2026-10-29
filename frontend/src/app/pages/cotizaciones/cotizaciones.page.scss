@@ -1,0 +1,173 @@
+.aesthetic-card {
+  border-radius: 14px;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.04);
+  border: 1px solid #eaeaea;
+  background: #ffffff;
+}
+
+.ingredients-selector-container {
+  max-height: 220px;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding-right: 4px;
+
+  .ingredient-chip-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background: #f8f9fa;
+    padding: 10px 14px;
+    border-radius: 10px;
+    border: 1px solid #eee;
+
+    .ing-info {
+      display: flex;
+      flex-direction: column;
+      strong {
+        font-size: 0.95rem;
+        color: #333;
+      }
+      .sub-info {
+        font-size: 0.78rem;
+        color: #666;
+      }
+    }
+  }
+}
+
+.detalle-item-box {
+  background: #fcfcfc;
+  border: 1px solid #e0e0e0;
+  border-radius: 12px;
+  padding: 14px;
+  margin-bottom: 14px;
+
+  .detalle-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 8px;
+    strong {
+      font-size: 1rem;
+      color: var(--ion-color-dark);
+    }
+  }
+
+  .detalle-calc-grid {
+    display: grid;
+    grid-template-columns: 1fr auto;
+    gap: 12px;
+    align-items: center;
+
+    .input-container {
+      background: #ffffff;
+      border: 1px solid #ccc;
+      border-radius: 8px;
+      padding: 4px 8px;
+    }
+
+    .subtotal-display {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-end;
+      background: #f0f4f8;
+      padding: 8px 14px;
+      border-radius: 8px;
+      border: 1px solid #d0e1f9;
+
+      .label-sub {
+        font-size: 0.7rem;
+        color: #555;
+        text-transform: uppercase;
+        font-weight: 600;
+      }
+      .value-sub {
+        font-size: 1.1rem;
+        font-weight: bold;
+        color: var(--ion-color-primary);
+      }
+    }
+  }
+
+  .base-reference {
+    font-size: 0.75rem;
+    color: #888;
+    margin-top: 8px;
+    font-style: italic;
+  }
+}
+
+.total-summary-card {
+  border-radius: 14px;
+  background: #fdfbf7; // Un tono crema muy suave y cálido
+  color: #333333; // Texto oscuro para que tenga excelente contraste y legibilidad
+  border: 1px solid #f0e6d2; // Borde sutil acorde al tono crema
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.04);
+
+  .summary-row {
+    display: flex;
+    justify-content: space-between;
+    font-size: 0.95rem;
+    margin-bottom: 8px;
+    color: #666666;
+
+    &.multiplier {
+      font-size: 0.85rem;
+      color: #888888;
+    }
+
+    &.final-total {
+      font-size: 1.3rem;
+      font-weight: bold;
+      color: var(--ion-color-primary); // El total se destaca con el color principal (rosado/vino)
+      border-top: 1px solid #e8dec9;
+      padding-top: 10px;
+      margin-top: 8px;
+    }
+  }
+}
+
+.search-dropdown-list {
+  max-height: 180px;
+  overflow-y: auto;
+  background: #ffffff;
+  border: 1px solid #dcdcdc;
+  border-radius: 8px;
+  margin-bottom: 12px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+
+  .search-dropdown-item {
+    padding: 10px 14px;
+    border-bottom: 1px solid #f0f0f0;
+    cursor: pointer;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+
+    &:hover {
+      background: #f8f9fa;
+    }
+
+    strong {
+      font-size: 0.9rem;
+      color: #333;
+    }
+
+    .dropdown-sub {
+      font-size: 0.78rem;
+      color: #666;
+    }
+  }
+}
+
+.selected-badge-box {
+  background: #f0f4f8;
+  border: 1px solid #d0e1f9;
+  border-radius: 8px;
+  padding: 10px 14px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
