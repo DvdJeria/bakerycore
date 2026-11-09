@@ -1,0 +1,149 @@
+<ion-header [translucent]="true">
+  <ion-toolbar color="primary">
+    <ion-buttons slot="start">
+      <ion-menu-button></ion-menu-button>
+    </ion-buttons>
+    <ion-title>Calendario de Pedidos</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content [fullscreen]="true" class="ion-padding">
+
+  <!-- Vista Principal: Solo el Calendario -->
+  <div style="max-width: 600px; margin: 0 auto;">
+
+    <!-- Saludo Personalizado -->
+    <div style="margin-bottom: 16px; padding: 0 4px;">
+      <h2 style="font-size: 1.25rem; font-weight: bold; color: #333; margin: 0;">
+        ¡Hola, {{ nombreUsuario }}! 💕
+      </h2>
+      <p style="font-size: 0.9rem; color: #666; margin: 4px 0 0 0;">
+        Selecciona una fecha en el calendario para ver o gestionar sus pedidos.
+      </p>
+    </div>
+
+    <ion-card style="border-radius: 16px; box-shadow: 0 4px 16px rgba(0,0,0,0.06);">
+      <ion-card-content style="padding: 0;">
+        <ion-datetime
+          presentation="date"
+          [(ngModel)]="fechaSeleccionada"
+          (ionChange)="onDateSelected($event)"
+          [highlightedDates]="diasResaltados"
+          locale="es-ES"
+          size="cover">
+        </ion-datetime>
+      </ion-card-content>
+    </ion-card>
+  </div>
+
+  <!-- Botón flotante para crear nuevo pedido rápidamente -->
+  <ion-fab vertical="bottom" horizontal="end" slot="fixed">
+    <ion-fab-button (click)="abrirModalFormulario()" color="primary" [disabled]="esFechaAnteriorHoy()">
+      <ion-icon name="add"></ion-icon>
+    </ion-fab-button>
+  </ion-fab>
+
+</ion-content>
+
+<!-- Modal Desplegable: Pedidos del Día Seleccionado -->
+<ion-modal [isOpen]="isModalDiaOpen" (didDismiss)="isModalDiaOpen = false">
+  <ng-template>
+    <ion-header>
+      <ion-toolbar color="light">
+        <ion-title style="font-size: 1rem; font-weight: bold;">
+          {{ fechaSeleccionada | date:'longDate' }}
+        </ion-title>
+        <ion-buttons slot="end">
+          <ion-button (click)="isModalDiaOpen = false" color="dark">Cerrar</ion-button>
+        </ion-buttons>
+      </ion-toolbar>
+    </ion-header>
+
+    <ion-content class="ion-padding" style="background: #f9f9f9;">
+
+      <!-- 1. Botón superior siempre disponible -->
+      <div style="text-align: right; margin-bottom: 16px;">
+        <ion-button fill="outline" size="small" (click)="abrirModalFormulario()" [disabled]="esFechaAnteriorHoy()">
+          <ion-icon name="add" slot="start"></ion-icon>
+          Agregar pedido aquí
+        </ion-button>
+      </div>
+
+      <!-- 2. Condicional limpio para mostrar o los pedidos o el aviso de vacío (NUNCA ambos) -->
+      @if (pedidosDelDia.length > 0) {
+        <!-- Si hay pedidos, se muestra el listado -->
+        <ion-list lines="none" style="background: transparent;">
+          @for (pedido of pedidosDelDia; track pedido.ped_id) {
+            <ion-item-sliding #slidingItem style="margin-bottom: 12px; border-radius: 12px; overflow: hidden;">
+
+              <ion-item style="--padding-start: 0; --padding-end: 0; --background: transparent;">
+                <ion-card style="width: 100%; margin: 0; border-radius: 12px; box-shadow: 0 2px 10px rgba(0,0,0,0.04);">
+                  <ion-card-content style="padding: 16px;">
+                    <div style="display: flex; justify-content: space-between; align-items: flex-start;">
+
+                      <!-- Información del Pedido -->
+                      <div style="flex: 1; padding-right: 12px;">
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
+                          <h3 style="font-weight: bold; font-size: 1.05rem; color: #222; margin: 0;">
+                            {{ pedido.ped_nombre }}
+                          </h3>
+                          <!-- Muestra la hora exacta del pedido -->
+                          <span style="font-size: 0.85rem; font-weight: 600; color: #e63946; background: #ffe5e9; padding: 2px 8px; border-radius: 6px;">
+                            <ion-icon name="time-outline" style="vertical-align: middle;"></ion-icon>
+                            {{ pedido.ped_fecha_entrega | date:'shortTime' }}
+                          </span>
+                        </div>
+                        <p style="font-size: 0.85rem; color: #555; margin: 0 0 4px 0;">
+                          Cliente: <strong>{{ pedido.cliente?.cli_nombre }} {{ pedido.cliente?.cli_apellido }}</strong>
+                          @if (pedido.cliente?.cli_telefono) {
+                            <span> | Telefono: {{ pedido.cliente?.cli_telefono }}</span>
+                          }
+                        </p>
+                        @if (pedido.ped_observaciones) {
+                          <p
+                            style="font-size: 0.8rem; color: #666; font-style: italic; margin: 6px 0 0 0; background: #fdfdfd; padding: 6px; border-left: 3px solid #ddd;">
+                            Nota: "{{ pedido.ped_observaciones }}"
+                          </p>
+                        }
+                        <div
+                          style="margin-top: 10px; font-weight: bold; color: var(--ion-color-primary); font-size: 1rem;">
+                          ${{ pedido.ped_precio | number:'1.0-0' }}
+                        </div>
+                      </div>
+
+                      <!-- Estado del Pedido -->
+                      <div style="text-align: right; min-width: 90px;">
+                    <span class="badge-estado" [ngClass]="getClaseEstado(pedido.estado_pedido?.est_nombre)">
+                      {{ pedido.estado_pedido?.est_nombre || 'Pendiente' }}
+                    </span>
+                      </div>
+
+                    </div>
+                  </ion-card-content>
+                </ion-card>
+              </ion-item>
+
+              <!-- Opciones al deslizar -->
+              <ion-item-options side="end">
+                <ion-item-option color="primary" (click)="editarPedido(pedido); slidingItem.close();">
+                  <ion-icon slot="icon-only" name="create-outline"></ion-icon>
+                </ion-item-option>
+                <ion-item-option color="danger" (click)="eliminarPedido(pedido); slidingItem.close();">
+                  <ion-icon slot="icon-only" name="trash-outline"></ion-icon>
+                </ion-item-option>
+              </ion-item-options>
+
+            </ion-item-sliding>
+          }
+        </ion-list>
+      } @else {
+        <!-- Si la lista está vacía, se muestra este mensaje único al centro -->
+        <div style="text-align: center; padding: 50px 20px; color: #777;">
+          <ion-icon name="calendar-outline" style="font-size: 48px; margin-bottom: 12px; color: #ccc;"></ion-icon>
+          <p style="font-size: 1rem; margin-bottom: 16px;">No hay pedidos agendados para este dia.</p>
+        </div>
+      }
+
+    </ion-content>
+  </ng-template>
+</ion-modal>

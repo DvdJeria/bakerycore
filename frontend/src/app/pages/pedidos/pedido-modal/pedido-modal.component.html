@@ -1,0 +1,61 @@
+<ion-header>
+  <ion-toolbar color="primary">
+    <ion-title>{{ esEdicion ? 'Editar Pedido' : 'Nuevo Pedido' }}</ion-title>
+    <ion-buttons slot="end">
+      <ion-button (click)="cerrarModal()">Cancelar</ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content class="ion-padding">
+  <form (ngSubmit)="guardarPedido()">
+
+    <ion-item fill="solid" class="ion-margin-bottom">
+      <ion-select label="Cliente" labelPlacement="stacked" [(ngModel)]="pedidoForm.cli_id" name="cli_id" required>
+        @for (cliente of clientes; track cliente.cli_id) {
+          <ion-select-option [value]="cliente.cli_id">
+            {{ cliente.cli_nombre }} {{ cliente.cli_apellido }} ({{ cliente.cli_telefono || 'Sin telefono' }})
+          </ion-select-option>
+        }
+      </ion-select>
+    </ion-item>
+
+    <ion-item fill="solid" class="ion-margin-bottom">
+      <ion-input label="Nombre o Resumen del Encargo" labelPlacement="stacked" [(ngModel)]="pedidoForm.ped_nombre" name="ped_nombre" placeholder="Ej. Torta de Novios 20 personas" required></ion-input>
+    </ion-item>
+
+    <ion-item fill="solid" class="ion-margin-bottom">
+      <ion-input type="number" min="0" label="Precio Total ($)" labelPlacement="stacked" [(ngModel)]="pedidoForm.ped_precio" name="ped_precio" placeholder="0" required></ion-input>
+    </ion-item>
+
+    <ion-item fill="solid" class="ion-margin-bottom">
+      <ion-select label="Estado" labelPlacement="stacked" [(ngModel)]="pedidoForm.est_id" name="est_id" required>
+        @for (estado of estados; track estado.est_id) {
+          <ion-select-option [value]="estado.est_id">
+            {{ estado.est_nombre }}
+          </ion-select-option>
+        }
+      </ion-select>
+    </ion-item>
+
+    <ion-item fill="solid" class="ion-margin-bottom">
+      <ion-datetime-button datetime="datetime"></ion-datetime-button>
+      <ion-modal [keepContentsMounted]="true">
+        <ng-template>
+          <ion-datetime id="datetime" presentation="date-time" [(ngModel)]="pedidoForm.ped_fecha_entrega" name="ped_fecha_entrega" [min]="minFechaEntrega"></ion-datetime>
+        </ng-template>
+      </ion-modal>
+    </ion-item>
+
+    <ion-item fill="solid" class="ion-margin-bottom">
+      <ion-textarea label="Observaciones o Notas Especiales" labelPlacement="stacked" [(ngModel)]="pedidoForm.ped_observaciones" name="ped_observaciones" placeholder="Ej. Alergia a las nueces, dedicatoria con chocolate..."></ion-textarea>
+    </ion-item>
+
+    <div class="ion-margin-top">
+      <ion-button expand="block" type="submit" color="primary">
+        {{ esEdicion ? 'Guardar Cambios' : 'Crear Pedido' }}
+      </ion-button>
+    </div>
+
+  </form>
+</ion-content>

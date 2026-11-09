@@ -38,5 +38,14 @@ export const routes: Routes = [
     path: 'cotizaciones',
     loadComponent: () => import('./pages/cotizaciones/cotizaciones.page').then(m => m.CotizacionesPage),
     canActivate: [authGuard]
-  }
+  },
+  {
+    path: 'pedidos',
+    loadComponent: () => import('./pages/pedidos/pedidos.page').then( m => m.PedidosPage)
+  },
+  {
+    path: 'pedidos',
+    loadComponent: () => import('./pages/pedidos/pedidos.page').then(m => m.PedidosPage),
+    canActivate: [authGuard]
+  },
 ];

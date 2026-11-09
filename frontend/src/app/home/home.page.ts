@@ -2,13 +2,13 @@ import { Component, OnInit, inject, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { IonHeader, IonToolbar, IonTitle, IonContent, IonButtons,
   IonMenuButton, IonSpinner, IonList, IonItemSliding, IonItem,
-  IonThumbnail, IonLabel, IonAccordionGroup, IonAccordion,
+  IonButton, IonLabel, IonAccordionGroup, IonAccordion,
   IonItemOptions, IonItemOption, IonIcon, IonFab, IonFabButton,
   IonText, AlertController, LoadingController, ModalController, ToastController
 } from '@ionic/angular';
 
 import { addIcons } from 'ionicons';
-import { fastFoodOutline, createOutline, trashOutline, add, menuOutline } from 'ionicons/icons';
+import { logOutOutline, fastFoodOutline, createOutline, trashOutline, add, menuOutline } from 'ionicons/icons';
 
 import { SupabaseService } from '../services/supabase';
 import { Router } from '@angular/router';
@@ -23,7 +23,7 @@ import { RecipeModalComponent } from './recipe-modal/recipe-modal.component';
   imports: [
     CommonModule, IonHeader, IonToolbar, IonTitle, IonContent, IonButtons,
     IonMenuButton, IonSpinner, IonList, IonItemSliding, IonItem,
-    IonLabel, IonAccordionGroup, IonAccordion,
+    IonLabel, IonAccordionGroup, IonAccordion, IonButton,
     IonItemOptions, IonItemOption, IonIcon, IonFab, IonFabButton, IonText
   ]
 })
@@ -41,6 +41,7 @@ export class HomePage implements OnInit {
 
   constructor() {
     addIcons({
+      'log-out-outline': logOutOutline,
       'fast-food-outline': fastFoodOutline,
       'create-outline': createOutline,
       'trash-outline': trashOutline,
