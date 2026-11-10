@@ -12,6 +12,7 @@ import {
   ToastController
 } from '@ionic/angular';
 import { SupabaseService } from '../services/supabase';
+import { PushService } from '../services/push';
 
 @Component({
   selector: 'app-login',
@@ -30,12 +31,13 @@ import { SupabaseService } from '../services/supabase';
   ]
 })
 
-export class LoginPage implements OnInit {
+export class LoginPage{
 
   // Inyección de dependencias moderna con inject()
   private supabaseService = inject(SupabaseService);
   private router = inject(Router);
   private toastController = inject(ToastController);
+  private pushService = inject(PushService);
 
   email: string = '';
   password: string = '';
@@ -56,8 +58,6 @@ export class LoginPage implements OnInit {
     });
     await toast.present();
   }
-
-  async ngOnInit() {}
 
   async onLogin() {
     if (!this.email || !this.password) {
@@ -83,6 +83,7 @@ export class LoginPage implements OnInit {
       } else if (data.session) {
         await this.mostrarMensaje('¡Bienvenido a BakeryCore!', 'success');
         this.router.navigate(['/home'], { replaceUrl: true });
+        this.despuesDeLogin();
       }
     } catch (err) {
       console.error('Error inesperado al iniciar sesión:', err);
@@ -90,6 +91,10 @@ export class LoginPage implements OnInit {
     } finally {
       this.cargando = false;
     }
+  }
+
+  async despuesDeLogin() {
+    await this.pushService.initPushNotifications();
   }
 
 }
