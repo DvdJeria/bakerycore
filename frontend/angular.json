@@ -33,7 +33,12 @@
                 "output": "./svg"
               },
               "src/assets",
-              "src/favicon.ico"
+              "src/favicon.ico",
+              {
+                "glob": "sw.js",
+                "input": "src",
+                "output": "/"
+              }
             ],
             "styles": [
               "src/global.scss", "src/theme/variables.scss"],
