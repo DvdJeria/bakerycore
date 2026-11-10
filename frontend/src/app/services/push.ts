@@ -1,4 +1,5 @@
 import { Injectable, inject } from '@angular/core';
+import { ToastController } from '@ionic/angular';
 import { SupabaseService } from './supabase';
 
 @Injectable({
@@ -6,49 +7,43 @@ import { SupabaseService } from './supabase';
 })
 export class PushService {
   private supabaseService = inject(SupabaseService);
+  private toastController = inject(ToastController);
 
   async initPushNotifications() {
-    alert('1. Iniciando proceso de push...');
-
     if (Notification.permission === 'denied') {
-      alert('❌ Permisos denegados previamente en el navegador.');
+      await this.presentToast('Permisos denegados previamente en el navegador.', 'danger');
       return;
     }
 
     if (!('serviceWorker' in navigator) || !('PushManager' in window)) {
-      alert('❌ Este entorno no soporta Web Push.');
+      await this.presentToast('Este entorno no soporta Web Push.', 'danger');
       return;
     }
 
     try {
       let permission: NotificationPermission = Notification.permission;
       if (permission === 'default') {
-        alert('2. Solicitando permiso nativo al usuario...');
         permission = await Notification.requestPermission();
       }
 
       if (permission !== 'granted') {
-        alert('❌ El usuario rechazó o ignoró el permiso.');
+        await this.presentToast('El usuario rechazó o ignoró el permiso de notificaciones.', 'danger');
         return;
       }
 
-      alert('3. Permiso concedido. Esperando Service Worker...');
       const registration = await navigator.serviceWorker.ready;
-      alert('4. Service Worker listo.');
-
       const vapidPublicKey = 'BGNHW6iJtHc10Rnh3o_gFgqztbOrDb8OGQOq7j1EG_6f-FhUucDmG43MqNPHsLDKe49x_iyDB-3kfwCLDOTQMME';
 
-      alert('5. Suscribiendo al PushManager...');
       const subscription = await registration.pushManager.subscribe({
         userVisibleOnly: true,
         applicationServerKey: this.urlBase64ToUint8Array(vapidPublicKey) as unknown as BufferSource
       });
-      alert('6. Suscripción obtenida con éxito. Guardando en Supabase...');
 
       await this.guardarSuscripcionEnSupabase(subscription);
 
     } catch (error: any) {
-      alert('🔥 EXCEPCIÓN CRÍTICA: ' + (error.message || JSON.stringify(error)));
+      console.error('Excepción crítica en Push:', error);
+      await this.presentToast('Error al inicializar las notificaciones.', 'danger');
     }
   }
 
@@ -57,11 +52,11 @@ export class PushService {
       const { data: { user }, error: authError } = await this.supabaseService.client.auth.getUser();
 
       if (authError || !user) {
-        alert('🔥 Error Auth: No hay usuario detectado. ' + (authError?.message || 'User is null'));
+        console.error('Error Auth:', authError?.message || 'User is null');
+        await this.presentToast('No hay una sesión de usuario activa.', 'danger');
         return;
       }
 
-      alert('7. Usuario autenticado ID: ' + user.id.substring(0, 6) + '...');
       const endpointHash = await this.generateEndpointHash(subscription.endpoint);
 
       const { error } = await this.supabaseService.client
@@ -76,12 +71,14 @@ export class PushService {
         );
 
       if (error) {
-        alert(`🔥 Error Supabase [${error.code}]: ${error.message} - ${error.details}`);
+        console.error(`Error Supabase [${error.code}]:`, error.message, error.details);
+        await this.presentToast('No se pudo guardar la suscripción en la base de datos.', 'danger');
       } else {
-        alert('🎉 ¡ÉXITO! Token guardado correctamente en la BD.');
+        await this.presentToast('¡Notificaciones configuradas correctamente!', 'success');
       }
     } catch (err: any) {
-      alert('🔥 Error en guardado Supabase: ' + err.message);
+      console.error('Error en guardado Supabase:', err);
+      await this.presentToast('Error de comunicación con el servidor.', 'danger');
     }
   }
 
@@ -104,5 +101,21 @@ export class PushService {
       outputArray[i] = rawData.charCodeAt(i);
     }
     return outputArray;
+  }
+
+  private async presentToast(message: string, color: 'success' | 'danger') {
+    const toast = await this.toastController.create({
+      message: message,
+      duration: 3000,
+      position: 'bottom',
+      color: color,
+      buttons: [
+        {
+          text: 'OK',
+          role: 'cancel'
+        }
+      ]
+    });
+    await toast.present();
   }
 }
