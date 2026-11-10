@@ -23,7 +23,8 @@ export const routes: Routes = [
   },
   {
     path: 'clientes',
-    loadComponent: () => import('./pages/clientes/clientes.page').then( m => m.ClientesPage)
+    loadComponent: () => import('./pages/clientes/clientes.page').then( m => m.ClientesPage),
+    canActivate: [authGuard]
   },
   {
     path: 'clientes',
@@ -32,7 +33,8 @@ export const routes: Routes = [
   },
   {
     path: 'cotizaciones',
-    loadComponent: () => import('./pages/cotizaciones/cotizaciones.page').then( m => m.CotizacionesPage)
+    loadComponent: () => import('./pages/cotizaciones/cotizaciones.page').then( m => m.CotizacionesPage),
+    canActivate: [authGuard]
   },
   {
     path: 'cotizaciones',
@@ -41,7 +43,8 @@ export const routes: Routes = [
   },
   {
     path: 'pedidos',
-    loadComponent: () => import('./pages/pedidos/pedidos.page').then( m => m.PedidosPage)
+    loadComponent: () => import('./pages/pedidos/pedidos.page').then( m => m.PedidosPage),
+    canActivate: [authGuard]
   },
   {
     path: 'pedidos',

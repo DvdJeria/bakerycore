@@ -76,7 +76,7 @@ export class PushService {
         );
 
       if (error) {
-        alert('🔥 Error Supabase DB: ' + error.message);
+        alert(`🔥 Error Supabase [${error.code}]: ${error.message} - ${error.details}`);
       } else {
         alert('🎉 ¡ÉXITO! Token guardado correctamente en la BD.');
       }
