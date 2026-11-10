@@ -51,12 +51,17 @@ export class PushService {
       return;
     }
 
+    const endpointHash = await this.generateEndpointHash(subscription.endpoint);
+
     const { error } = await this.supabaseService.client
       .from('device_tokens')
       .upsert(
         {
           user_id: user.id,
+          token: JSON.stringify(subscription),
+          endpoint_hash: endpointHash
         },
+        { onConflict: 'endpoint_hash' }
       );
 
     if (error) {
@@ -66,6 +71,15 @@ export class PushService {
     }
   }
 
+  private async generateEndpointHash(endpoint: string): Promise<string> {
+    const encoder = new TextEncoder();
+    const data = encoder.encode(endpoint);
+    const hashBuffer = await crypto.subtle.digest('SHA-256', data);
+    const hashArray = Array.from(new Uint8Array(hashBuffer));
+    return hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
+  }
+
+  private urlBase64ToUint8Array(base64String: string): Uint8Array {
     const padding = '='.repeat((4 - (base64String.length % 4)) % 4);
     const base64 = (base64String + padding).replace(/-/g, '+').replace(/_/g, '/');
 
