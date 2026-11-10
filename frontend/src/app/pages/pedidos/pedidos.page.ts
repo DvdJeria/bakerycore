@@ -53,6 +53,7 @@ export class PedidosPage implements OnInit {
 
   ionViewWillEnter() {
     this.cargarPedidos();
+    this.cargarUsuario();
   }
 
   async cargarUsuario() {
@@ -61,6 +62,8 @@ export class PedidosPage implements OnInit {
       // Si tiene metadata con nombre, lo usa; si no, toma la parte inicial de su correo
       this.nombreUsuario = user.user_metadata?.['nombre'] || user.email?.split('@')[0] || 'Usuario';
     }
+
+    this.cdr.detectChanges();
   }
 
   async cargarPedidos() {
@@ -102,7 +105,13 @@ export class PedidosPage implements OnInit {
 
     this.fechaSeleccionada = fecha;
     this.filtrarPedidosPorFecha(fecha);
-    this.isModalDiaOpen = true;
+
+    //Forzamos la apertura limpia del modal al primer toque
+    this.isModalDiaOpen = false; //Breve reseteo de estado por si acaso
+    setTimeout(() => {
+      this.isModalDiaOpen = true;
+      this.cdr.detectChanges();
+    }, 50);
   }
 
   filtrarPedidosPorFecha(fechaIso: string) {

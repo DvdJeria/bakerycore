@@ -1,38 +1,56 @@
-import { Component } from '@angular/core';
-import { RouterLink, RouterModule } from "@angular/router";
+import { Component, inject } from '@angular/core';
+import { RouterModule } from '@angular/router';
+
 import {
-  IonApp, IonMenu, IonHeader, IonToolbar, IonTitle,
+  IonApp,
+  IonMenu,
+  IonHeader,
+  IonToolbar,
+  IonTitle,
   IonContent,
   IonList,
   IonMenuToggle,
   IonItem,
   IonIcon,
   IonLabel,
-  IonRouterOutlet,
+  IonRouterOutlet
+} from '@ionic/angular';
 
-} from '@ionic/angular'; // <-- Importa los componentes de la lista
 import { addIcons } from 'ionicons';
-import { bookOutline, calendarOutline, calculatorOutline, peopleOutline, cubeOutline } from 'ionicons/icons';
+import {
+  bookOutline,
+  calendarOutline,
+  calculatorOutline,
+  peopleOutline,
+  cubeOutline
+} from 'ionicons/icons';
 
+import { SupabaseService } from './services/supabase';
 
 @Component({
   selector: 'app-root',
   templateUrl: 'app.component.html',
   imports: [
-    RouterModule, // <-- Indispensable para que funcionen tus routerLink en Standalone
+    RouterModule,
+    IonApp,
+    IonMenu,
+    IonHeader,
+    IonToolbar,
+    IonTitle,
     IonContent,
     IonList,
     IonMenuToggle,
     IonItem,
     IonIcon,
     IonLabel,
-    IonApp, IonMenu, IonHeader, IonToolbar, IonTitle,
     IonRouterOutlet
-  ],
+  ]
 })
 export class AppComponent {
+
+  private supabaseService = inject(SupabaseService);
+
   constructor() {
-    // REGISTRA LOS ÍCONOS NUEVAMENTE PARA ESTE COMPONENTE
     addIcons({
       'book-outline': bookOutline,
       'calendar-outline': calendarOutline,
@@ -41,4 +59,5 @@ export class AppComponent {
       'cube-outline': cubeOutline
     });
   }
+
 }
