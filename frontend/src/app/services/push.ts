@@ -7,23 +7,18 @@ import { SupabaseService } from './supabase';
 export class PushService {
   private supabaseService = inject(SupabaseService);
 
-  // Método principal para inicializar y registrar las notificaciones
   async initPushNotifications() {
-    // 1. Si el navegador denegó los permisos previamente, no hacemos nada
     if (Notification.permission === 'denied') {
       console.warn('Los permisos de notificación fueron denegados por el usuario.');
       return;
     }
 
-    // 2. Verificamos que el navegador soporte Service Workers y Push Manager
     if (!('serviceWorker' in navigator) || !('PushManager' in window)) {
       console.warn('Este navegador no soporta Web Push Notifications.');
       return;
     }
 
     try {
-      // 3. Solicitamos permiso SOLO si está en estado 'default' (primera vez).
-      // Tipamos explícitamente como NotificationPermission para evitar conflictos de tipos.
       let permission: NotificationPermission = Notification.permission;
       if (permission === 'default') {
         permission = await Notification.requestPermission();
@@ -34,10 +29,7 @@ export class PushService {
         return;
       }
 
-      // 4. Esperamos a que el Service Worker esté listo
       const registration = await navigator.serviceWorker.ready;
-
-      // 5. Suscribimos al dispositivo usando la llave VAPID pública
       const vapidPublicKey = 'BGNHW6iJtHc10Rnh3o_gFgqztbOrDb8OGQOq7j1EG_6f-FhUucDmG43MqNPHsLDKe49x_iyDB-3kfwCLDOTQMME';
 
       const subscription = await registration.pushManager.subscribe({
@@ -45,7 +37,6 @@ export class PushService {
         applicationServerKey: this.urlBase64ToUint8Array(vapidPublicKey)
       });
 
-      // 6. Sincronizamos la suscripción silenciosamente en Supabase
       await this.guardarSuscripcionEnSupabase(subscription);
 
     } catch (error) {
@@ -53,7 +44,6 @@ export class PushService {
     }
   }
 
-  // Guardar o actualizar el token en la tabla device_tokens de Supabase
   private async guardarSuscripcionEnSupabase(subscription: PushSubscription) {
     const { data: { user } } = await this.supabaseService.client.auth.getUser();
     if (!user) {
@@ -66,10 +56,7 @@ export class PushService {
       .upsert(
         {
           user_id: user.id,
-          token: JSON.stringify(subscription), // Guardamos el objeto completo de suscripción
-          updated_at: new Date().toISOString()
         },
-        { onConflict: 'user_id' }
       );
 
     if (error) {
@@ -79,8 +66,6 @@ export class PushService {
     }
   }
 
-  // Utilidad estándar para convertir la llave VAPID de Base64 a Uint8Array compatible con PushManager
-  private urlBase64ToUint8Array(base64String: string): any {
     const padding = '='.repeat((4 - (base64String.length % 4)) % 4);
     const base64 = (base64String + padding).replace(/-/g, '+').replace(/_/g, '/');
 
