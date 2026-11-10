@@ -8,66 +8,80 @@ export class PushService {
   private supabaseService = inject(SupabaseService);
 
   async initPushNotifications() {
+    alert('1. Iniciando proceso de push...');
+
     if (Notification.permission === 'denied') {
-      console.warn('Los permisos de notificación fueron denegados por el usuario.');
+      alert('❌ Permisos denegados previamente en el navegador.');
       return;
     }
 
     if (!('serviceWorker' in navigator) || !('PushManager' in window)) {
-      console.warn('Este navegador no soporta Web Push Notifications.');
+      alert('❌ Este entorno no soporta Web Push.');
       return;
     }
 
     try {
       let permission: NotificationPermission = Notification.permission;
       if (permission === 'default') {
+        alert('2. Solicitando permiso nativo al usuario...');
         permission = await Notification.requestPermission();
       }
 
       if (permission !== 'granted') {
-        console.log('Permiso de notificación no concedido.');
+        alert('❌ El usuario rechazó o ignoró el permiso.');
         return;
       }
 
+      alert('3. Permiso concedido. Esperando Service Worker...');
       const registration = await navigator.serviceWorker.ready;
+      alert('4. Service Worker listo.');
+
       const vapidPublicKey = 'BGNHW6iJtHc10Rnh3o_gFgqztbOrDb8OGQOq7j1EG_6f-FhUucDmG43MqNPHsLDKe49x_iyDB-3kfwCLDOTQMME';
 
+      alert('5. Suscribiendo al PushManager...');
       const subscription = await registration.pushManager.subscribe({
         userVisibleOnly: true,
         applicationServerKey: this.urlBase64ToUint8Array(vapidPublicKey) as unknown as BufferSource
       });
+      alert('6. Suscripción obtenida con éxito. Guardando en Supabase...');
 
       await this.guardarSuscripcionEnSupabase(subscription);
 
-    } catch (error) {
-      console.error('Error al inicializar las notificaciones push:', error);
+    } catch (error: any) {
+      alert('🔥 EXCEPCIÓN CRÍTICA: ' + (error.message || JSON.stringify(error)));
     }
   }
 
   private async guardarSuscripcionEnSupabase(subscription: PushSubscription) {
-    const { data: { user } } = await this.supabaseService.client.auth.getUser();
-    if (!user) {
-      console.warn('No hay un usuario autenticado para asociar el token push.');
-      return;
-    }
+    try {
+      const { data: { user }, error: authError } = await this.supabaseService.client.auth.getUser();
 
-    const endpointHash = await this.generateEndpointHash(subscription.endpoint);
+      if (authError || !user) {
+        alert('🔥 Error Auth: No hay usuario detectado. ' + (authError?.message || 'User is null'));
+        return;
+      }
 
-    const { error } = await this.supabaseService.client
-      .from('device_tokens')
-      .upsert(
-        {
-          user_id: user.id,
-          token: JSON.stringify(subscription),
-          endpoint_hash: endpointHash
-        },
-        { onConflict: 'endpoint_hash' }
-      );
+      alert('7. Usuario autenticado ID: ' + user.id.substring(0, 6) + '...');
+      const endpointHash = await this.generateEndpointHash(subscription.endpoint);
 
-    if (error) {
-      console.error('Error al guardar la suscripción en Supabase:', error.message);
-    } else {
-      console.log('Suscripción Web Push sincronizada exitosamente en Supabase.');
+      const { error } = await this.supabaseService.client
+        .from('device_tokens')
+        .upsert(
+          {
+            user_id: user.id,
+            token: JSON.stringify(subscription),
+            endpoint_hash: endpointHash
+          },
+          { onConflict: 'endpoint_hash' }
+        );
+
+      if (error) {
+        alert('🔥 Error Supabase DB: ' + error.message);
+      } else {
+        alert('🎉 ¡ÉXITO! Token guardado correctamente en la BD.');
+      }
+    } catch (err: any) {
+      alert('🔥 Error en guardado Supabase: ' + err.message);
     }
   }
 
