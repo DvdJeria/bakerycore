@@ -34,7 +34,7 @@ export class PushService {
 
       const subscription = await registration.pushManager.subscribe({
         userVisibleOnly: true,
-        applicationServerKey: this.urlBase64ToUint8Array(vapidPublicKey)
+        applicationServerKey: this.urlBase64ToUint8Array(vapidPublicKey) as unknown as BufferSource
       });
 
       await this.guardarSuscripcionEnSupabase(subscription);
