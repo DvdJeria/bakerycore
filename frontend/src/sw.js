@@ -1,38 +1,125 @@
-// sw.js - Service Worker para Web Push Notifications
-self.addEventListener('push', function(event) {
-  const data = event.data ? event.data.json() : { title: 'BakeryCore', body: 'Tienes una nueva actualización' };
 
-  const options = {
-    body: data.body,
-    icon: '/assets/icon/icon.png', // Asegúrate de tener este ícono o cámbialo por el tuyo
+/**
+ * BakeryCore - Service Worker
+ * Gestión de notificaciones Web Push.
+ */
+
+/**
+ * Recepción de notificaciones Push.
+ */
+self.addEventListener('push', (event) => {
+
+  let data = {
+    title: 'BakeryCore',
+    body: 'Tienes una nueva notificación.',
+    icon: '/assets/icon/icon.png',
     badge: '/assets/icon/icon.png',
-    data: {
-      url: data.url || '/'
-    }
+    url: '/'
   };
 
+  // Interpretar información recibida desde Supabase
+  try {
+
+    if (event.data) {
+      data = {
+        ...data,
+        ...event.data.json()
+      };
+    }
+
+  } catch (error) {
+
+    console.error(
+      'Error interpretando el mensaje Push:',
+      error
+    );
+  }
+
+  // Configuración de la notificación
+  const options = {
+    body: data.body,
+    icon: data.icon,
+    badge: data.badge,
+    data: {
+      url: data.url || '/'
+    },
+    tag: data.tag || 'bakerycore-notification',
+    renotify: false
+  };
+
+  // Mostrar notificación en el dispositivo
   event.waitUntil(
-    self.registration.showNotification(data.title, options)
+    self.registration.showNotification(
+      data.title,
+      options
+    )
   );
+
 });
 
-// Manejar el clic en la notificación para abrir la app en la página correcta
-self.addEventListener('notificationclick', function(event) {
+
+/**
+ * Acción al pulsar una notificación.
+ */
+self.addEventListener('notificationclick', (event) => {
+
   event.notification.close();
 
-  event.waitUntil(
-    clients.matchAll({ type: 'window', includeUncontrolled:true }).then(windowClients => {
-      // Si ya hay una ventana abierta, enfocarla
-      for (let i = 0; i < windowClients.length; i++) {
-        const client = windowClients[i];
-        if (client.url === event.notification.data.url && 'focus' in client) {
-          return client.focus();
-        }
-      }
-      // Si no, abrir una nueva ventana con la URL del evento
-      if (clients.openWindow) {
-        return clients.openWindow(event.notification.data.url);
-      }
-    })
+  const targetUrl = new URL(
+    event.notification.data?.url || '/',
+    self.location.origin
   );
+
+  // Evitar abrir direcciones externas
+  if (targetUrl.origin !== self.location.origin) {
+    return;
+  }
+
+  event.waitUntil(
+
+    clients.matchAll({
+      type: 'window',
+      includeUncontrolled: true
+    })
+
+      .then(async (windowClients) => {
+
+        // Buscar una ventana existente de BakeryCore
+        for (const client of windowClients) {
+
+          if (
+            new URL(client.url).origin === self.location.origin
+          ) {
+
+            await client.focus();
+
+            // Navegar a la ruta indicada
+            if (client.navigate) {
+              return client.navigate(targetUrl.href);
+            }
+
+            return;
+          }
+        }
+
+        // Abrir aplicación si no existe una ventana
+        return clients.openWindow(targetUrl.href);
+
+      })
+
+  );
+
+});
+
+
+/**
+ * Cierre de notificaciones.
+ */
+self.addEventListener('notificationclose', (event) => {
+
+  console.log(
+    'Notificación cerrada:',
+    event.notification.tag
+  );
+
 });
